@@ -1,0 +1,15 @@
+created:
+    - database/factories/ProposalFactory.php
+    - database/factories/VoteFactory.php
+    - database/factories/ProposalCommentFactory.php
+    - database/migrations/2023_12_25_161302_create_proposals_table.php
+    - database/migrations/2023_12_25_161303_create_votes_table.php
+    - database/migrations/2023_12_25_161304_create_proposal_comments_table.php
+    - app/Models/Proposal.php
+    - app/Models/Vote.php
+    - app/Models/ProposalComment.php
+models:
+    User: { name: string, email: string, email_verified_at: 'datetime nullable', password: string, remember_token: 'string:100 nullable' }
+    Proposal: { title: 'string:100', description: 'string:1000', user_id: unsignedInteger, status: 'string:100', relationships: { belongsTo: User, hasMany: 'Vote, ProposalComment' } }
+    Vote: { proposal_id: unsignedInteger, user_id: unsignedInteger, vote: tinyInteger, comment: 'string:1000', relationships: { belongsTo: 'Proposal, User' } }
+    ProposalComment: { proposal_id: unsignedInteger, user_id: unsignedInteger, comment: 'string:1000', relationships: { belongsTo: Proposal } }

@@ -1,0 +1,24 @@
+models:
+  Proposal:
+    title: string:100
+    description: string:1000
+    user_id: unsignedInteger
+    status: string:100
+    relationships:
+      belongsTo: User
+      hasMany: Vote, ProposalComment
+
+  Vote:
+    proposal_id: unsignedInteger
+    user_id: unsignedInteger
+    vote: tinyInteger
+    comment: string:1000
+    relationships:
+      belongsTo: Proposal, User
+
+  ProposalComment:
+    proposal_id: unsignedInteger
+    user_id: unsignedInteger
+    comment: string:1000
+    relationships:
+      belongsTo: Proposal
