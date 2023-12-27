@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Infolists\Components\Actions;
 use Filament\Infolists\Components\Fieldset;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
@@ -203,11 +204,21 @@ class ProposalResource extends Resource
                                     ->label(false)
                                     ->schema([
                                         TextEntry::make('name')
-                                            ->columnSpan(1)
                                             ->label(false),
 
                                     ])
                                     ->grid(2),
+                                Actions::make([
+                                    \Filament\Infolists\Components\Actions\Action::make('Notify Reviewers')
+                                        ->label('Notify Reviewers')
+                                        ->icon('heroicon-o-envelope')
+                                        ->action(function (\Filament\Forms\Set $set, $state) {
+                                            // dd($state);
+                                        })
+                                        ->closeModalByClickingAway(false),
+                                ])
+                                    ->visible(fn (Proposal $record): bool => $record->status == Status::Reviewing)
+                                    ->fullWidth(),
                             ]),
                         Fieldset::make('Events')
                             ->schema([
@@ -219,10 +230,11 @@ class ProposalResource extends Resource
                                     ->listWithLineBreaks()
                                     ->limitList(5)
                                     ->expandableLimitedList(),
+
                             ]),
 
                     ])->grow(false),
-                ])->columnSpanFull()->from('sm'),
+                ])->columnSpanFull()->from('md'),
 
             ]);
     }
