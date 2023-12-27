@@ -137,7 +137,6 @@ class ProposalResource extends Resource
                                                     titleAttribute: 'name',
                                                     modifyQueryUsing: fn (Builder $query) => $query->where('is_reviewer', true))
                                                 ->multiple()
-                                                ->live()
                                                 ->label('Reviewers')
                                                 ->createOptionForm([
                                                     Grid::make()
@@ -161,10 +160,21 @@ class ProposalResource extends Resource
 
                                                         ]),
 
-                                                ]),
+                                                ])
+                                                ->hintAction(
+                                                    \Filament\Forms\Components\Actions\Action::make('addDefaultReviewers')
+                                                        ->label('Add Default Reviewers')
+                                                        ->action(function (\Filament\Forms\Set $set, $state) {
+                                                            $defaultReviewers = \App\Models\User::whereIsDefaultReviewer(true)->pluck('id')->toArray();
+                                                            // Append default reviewers to existing reviewers
+                                                            $set('reviewers', array_merge($state, $defaultReviewers));
+
+                                                        })
+                                                ),
                                         ])
                                         ->action(function (array $data, Proposal $record): void {
                                             $record->update($data);
+                                            $record->touch();
                                         })
                                         ->closeModalByClickingAway(false),
 
@@ -175,6 +185,17 @@ class ProposalResource extends Resource
                             ->schema([
                                 TextEntry::make('reviewers.name')
                                     ->label(false)
+                                    ->listWithLineBreaks()
+                                    ->limitList(5)
+                                    ->expandableLimitedList(),
+                            ]),
+                        Fieldset::make('Events')
+                            ->schema([
+                                TextEntry::make('created_at')
+                                    ->listWithLineBreaks()
+                                    ->limitList(5)
+                                    ->expandableLimitedList(),
+                                TextEntry::make('updated_at')
                                     ->listWithLineBreaks()
                                     ->limitList(5)
                                     ->expandableLimitedList(),
