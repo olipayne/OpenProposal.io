@@ -22,9 +22,23 @@ class ProposalFactory extends Factory
     public function definition(): array
     {
         return [
-            'title' => $this->faker->sentence(4),
-            'description' => $this->faker->text(),
             'user_id' => User::factory(),
+            'applicant_info' => $this->faker->paragraphs(3, true),
+            'publication_title' => ucwords($this->faker->words(5, true)),
+            'proposed_authors' => $this->faker->randomElements([
+                $this->faker->name(),
+                $this->faker->name(),
+                $this->faker->name(),
+                $this->faker->name(),
+                $this->faker->name(),
+            ], $this->faker->numberBetween(1, 5)),
+            'study_background' => $this->faker->paragraphs(6, true),
+            'research_question' => $this->faker->paragraphs(6, true),
+            'data_and_population' => $this->faker->paragraphs(6, true),
+            'analysis_plan' => $this->faker->paragraphs(6, true),
+            'start_analysis_date' => $this->faker->dateTimeBetween('+6 months', '+7 months'),
+            'start_writing_date' => $this->faker->dateTimeBetween('+7 months', '+8 months'),
+            'completion_date' => $this->faker->dateTimeBetween('+13 months', '+18 months'),
             'status' => $this->faker->randomElement(Status::class),
         ];
     }

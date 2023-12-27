@@ -13,10 +13,18 @@ return new class extends Migration
     {
         Schema::create('proposals', function (Blueprint $table) {
             $table->id();
-            $table->string('title', 100);
-            $table->string('description', 1000);
             $table->foreignId('user_id');
-            $table->string('status', 100);
+            $table->string('applicant_info', 2000);
+            $table->string('publication_title', 200);
+            $table->json('proposed_authors');
+            $table->longText('study_background');
+            $table->longText('research_question');
+            $table->longText('data_and_population');
+            $table->longText('analysis_plan');
+            $table->date('start_analysis_date');
+            $table->date('start_writing_date');
+            $table->date('completion_date');
+            $table->string('status', 50);
             $table->timestamps();
         });
     }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Proposal extends Model
 {
@@ -17,6 +18,7 @@ class Proposal extends Model
         'id' => 'integer',
         'user_id' => 'integer',
         'status' => Status::class,
+        'proposed_authors' => 'array',
     ];
 
     public function user(): BelongsTo
@@ -37,5 +39,10 @@ class Proposal extends Model
     public function reviewers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'reviewers', 'proposal_id', 'user_id');
+    }
+
+    public function topic(): HasOne
+    {
+        return $this->hasOne(ProposalTopic::class);
     }
 }

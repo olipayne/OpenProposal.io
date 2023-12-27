@@ -1,0 +1,13 @@
+p {
+    counter-increment: lines;
+}
+
+p::before {
+    content: counter(lines);
+    display: inline-block;
+    border-right: 1px solid #ddd;
+    padding: 0 0.5em;
+    margin-right: 0.5em;
+    color: #888;
+    -webkit-user-select: none;
+}

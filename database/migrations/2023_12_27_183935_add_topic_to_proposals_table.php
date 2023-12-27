@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('reviewers', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('proposal_id')->constrained();
+        Schema::table('proposals', function (Blueprint $table) {
+            $table->foreignId('proposal_topic_id')->nullable()->constrained()->after('user_id');
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('reviewers');
+        Schema::table('proposals', function (Blueprint $table) {
+            $table->dropColumn('proposal_topic_id');
+        });
     }
 };

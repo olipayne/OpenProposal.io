@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\Status;
 use App\Filament\Resources\ProposalResource\Pages;
 use App\Models\Proposal;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -47,7 +48,8 @@ class ProposalResource extends Resource
         return $table
             ->persistFiltersInSession()
             ->columns([
-                Tables\Columns\TextColumn::make('title')
+                Tables\Columns\TextColumn::make('publication_title')
+                    ->label('Title')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
@@ -86,17 +88,95 @@ class ProposalResource extends Resource
         return $infolist
             ->schema([
                 Split::make([
-                    Section::make([
-                        TextEntry::make('title')
-                            ->size(TextEntrySize::Large)
-                            ->weight(FontWeight::Bold)
-                            ->label(false),
-                        TextEntry::make('user.name')
-                            ->label('Proposer'),
-                        TextEntry::make('description')
-                            ->markdown()
-                            ->prose(),
-                    ]),
+                    Grid::make()
+                        ->schema([
+                            Section::make('Applicant Info')
+                                ->schema([
+                                    Fieldset::make('User Info')
+                                        ->columns(3)
+                                        ->schema([
+                                            TextEntry::make('user.name')
+                                                ->label(false),
+                                            TextEntry::make('user.email')
+                                                ->columns(2)
+                                                ->label(false),
+                                        ]),
+                                    Fieldset::make('Applicant Info')
+                                        ->schema([
+                                            TextEntry::make('applicant_info')
+                                                ->columnSpanFull()
+                                                ->markdown()
+                                                ->prose()
+                                                ->label(false),
+                                        ]),
+
+                                ])
+                                ->collapsible(),
+                            Section::make('Proposal')
+                                ->schema([
+                                    TextEntry::make('publication_title')
+                                        ->size(TextEntrySize::Large)
+                                        ->weight(FontWeight::Bold)
+                                        ->label(false),
+                                    Fieldset::make('Proposed Authors')
+                                        ->schema([
+                                            TextEntry::make('proposed_authors')
+                                                ->columnSpanFull()
+                                                ->label(false),
+                                        ]
+                                        ),
+                                    Fieldset::make('Study Background')
+                                        ->schema([
+                                            TextEntry::make('study_background')
+                                                ->columnSpanFull()
+                                                ->markdown()
+                                                ->prose()
+                                                ->label(false),
+                                        ]),
+                                    Fieldset::make('Research Question')
+                                        ->schema([
+                                            TextEntry::make('research_question')
+                                                ->columnSpanFull()
+                                                ->markdown()
+                                                ->prose()
+                                                ->label(false),
+                                        ]),
+                                    Fieldset::make('Data and Population')
+                                        ->schema([
+                                            TextEntry::make('data_and_population')
+                                                ->columnSpanFull()
+                                                ->markdown()
+                                                ->prose()
+                                                ->label(false),
+                                        ]),
+                                    Fieldset::make('Analysis Plan')
+                                        ->schema([
+                                            TextEntry::make('analysis_plan')
+                                                ->columnSpanFull()
+                                                ->markdown()
+                                                ->prose()
+                                                ->label(false),
+                                        ]),
+                                    Fieldset::make('Timeline')
+                                        ->schema([
+                                            Grid::make()
+                                                ->schema([
+                                                    TextEntry::make('start_analysis_date')
+                                                        ->label('Start Analysis')
+                                                        ->columnSpan(1),
+                                                    TextEntry::make('start_writing_date')
+                                                        ->label('Start Writing')
+                                                        ->columnSpan(1),
+                                                    TextEntry::make('completion_date')
+                                                        ->label('Completion')
+                                                        ->columnSpan(1),
+                                                ])
+                                                ->columns(3),
+                                        ]),
+                                ])
+                                ->collapsible(),
+                        ]),
+
                     Section::make('Metadata')
                         ->label(false)
                         ->collapsible()
@@ -106,11 +186,13 @@ class ProposalResource extends Resource
                                 ->icon('heroicon-o-pencil')
                                 ->size('sm')
                                 ->fillForm(fn (Proposal $record): array => [
+                                    'proposal_topic_id' => $record->proposal_topic_id,
                                     'status' => $record->status,
                                     'reviewers' => $record->reviewers->pluck('id')->toArray(),
                                 ])
                                 ->form([
-                                    \Filament\Forms\Components\Select::make('status')
+                                    Select::make('status')
+                                        ->columns(1)
                                         ->required()
                                         ->options(Status::class)
                                         ->enum(Status::class)
@@ -118,8 +200,6 @@ class ProposalResource extends Resource
                                         ->rules([
                                             fn (\Filament\Forms\Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
                                                 $reviewers = $get('reviewers');
-                                                // $fail('Reviewers must be selected before moving to review state.');
-                                                // dd($reviewers);
                                                 // If reviewers list empty, don't allow moving to review state
                                                 if ($value == Status::Reviewing && empty($reviewers)) {
                                                     $fail('Reviewers must be selected before moving to review state.');
@@ -127,7 +207,12 @@ class ProposalResource extends Resource
 
                                             },
                                         ]),
-                                    \Filament\Forms\Components\Select::make('reviewers')
+                                    Select::make('proposal_topic_id')
+                                        ->required()
+                                        ->live()
+                                        ->options(fn (): array => \App\Models\ProposalTopic::all()->pluck('name', 'id')->toArray())
+                                        ->label('Topic'),
+                                    Select::make('reviewers')
                                         ->preload()
                                         ->searchable(['name', 'email'])
                                         ->searchPrompt('Search for reviewers')
@@ -174,12 +259,23 @@ class ProposalResource extends Resource
                                         ->hintAction(
                                             \Filament\Forms\Components\Actions\Action::make('addDefaultReviewers')
                                                 ->label('Add Default Reviewers')
-                                                // Disable if all of the default reviewers are already selected, with $get
-                                                ->disabled(fn (\Filament\Forms\Get $get): bool => empty(array_diff(\App\Models\User::whereIsDefaultReviewer(true)->pluck('id')->toArray(), $get('reviewers'))))
-                                                ->action(function (\Filament\Forms\Set $set, $state) {
+                                                // Disable if all of the default reviewers and reviewers for this topic are already selected
+                                                ->disabled(function (\Filament\Forms\Get $get) {
                                                     $defaultReviewers = \App\Models\User::whereIsDefaultReviewer(true)->pluck('id')->toArray();
-                                                    // Append default reviewers to existing reviewers
-                                                    $set('reviewers', array_merge($state, $defaultReviewers));
+                                                    $topicReviewers = $get('proposal_topic_id') ? \App\Models\ProposalTopic::find($get('proposal_topic_id'))->members->pluck('id')->toArray() : [];
+                                                    // If all default reviewers and topic reviewers are already selected, disable the button
+                                                    if (empty(array_diff($defaultReviewers, $get('reviewers'))) && empty(array_diff($topicReviewers, $get('reviewers')))) {
+                                                        return true;
+                                                    }
+
+                                                    return false;
+
+                                                })
+                                                ->action(function (\Filament\Forms\Set $set, \Filament\Forms\Get $get, $state) {
+                                                    $defaultReviewers = \App\Models\User::whereIsDefaultReviewer(true)->pluck('id')->toArray();
+                                                    $topicReviewers = $get('proposal_topic_id') ? \App\Models\ProposalTopic::find($get('proposal_topic_id'))->members->pluck('id')->toArray() : [];
+                                                    // Append all reviewers to existing reviewers
+                                                    $set('reviewers', array_unique(array_merge($get('reviewers'), $defaultReviewers, $topicReviewers)));
 
                                                 })
                                         ),

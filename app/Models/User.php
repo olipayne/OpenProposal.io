@@ -58,6 +58,11 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         return $this->hasMany(Proposal::class);
     }
 
+    public function topics(): BelongsToMany
+    {
+        return $this->belongsToMany(ProposalTopic::class, 'user_topics', 'user_id', 'proposal_topic_id');
+    }
+
     protected static function booted()
     {
         static::creating(function ($user) {
