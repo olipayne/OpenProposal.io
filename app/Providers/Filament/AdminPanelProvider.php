@@ -74,6 +74,7 @@ class AdminPanelProvider extends PanelProvider
                         shouldRegisterUserMenu: true,
                     ),
 
-            );
+            )
+            ->spa();
     }
 }
