@@ -165,7 +165,8 @@ class ProposalResource extends Resource
                                         ])
                                         ->action(function (array $data, Proposal $record): void {
                                             $record->update($data);
-                                        }),
+                                        })
+                                        ->closeModalByClickingAway(false),
 
                                 ]),
                             ]),
