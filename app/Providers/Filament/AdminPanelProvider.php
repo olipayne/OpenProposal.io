@@ -70,7 +70,7 @@ class AdminPanelProvider extends PanelProvider
                         requiresCurrentPassword: true,
                     )
                     ->myProfile(
-                        shouldRegisterNavigation: true,
+                        // shouldRegisterNavigation: true,
                         shouldRegisterUserMenu: true,
                     ),
 

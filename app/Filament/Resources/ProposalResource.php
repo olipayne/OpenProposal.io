@@ -10,6 +10,7 @@ use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Infolists\Components\Fieldset;
+use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\Split;
 use Filament\Infolists\Components\TextEntry;
@@ -196,12 +197,17 @@ class ProposalResource extends Resource
                             ]),
 
                         Fieldset::make('Reviewers')
+                            ->columns(1)
                             ->schema([
-                                TextEntry::make('reviewers.name')
+                                RepeatableEntry::make('reviewers')
                                     ->label(false)
-                                    ->listWithLineBreaks()
-                                    ->limitList(5)
-                                    ->expandableLimitedList(),
+                                    ->schema([
+                                        TextEntry::make('name')
+                                            ->columnSpan(1)
+                                            ->label(false),
+
+                                    ])
+                                    ->grid(2),
                             ]),
                         Fieldset::make('Events')
                             ->schema([
