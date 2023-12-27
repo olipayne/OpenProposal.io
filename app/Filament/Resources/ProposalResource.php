@@ -116,11 +116,14 @@ class ProposalResource extends Resource
                                                 ->required()
                                                 ->options(Status::class)
                                                 ->enum(Status::class)
+                                                ->live()
                                                 ->rules([
                                                     fn (\Filament\Forms\Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
                                                         $reviewers = $get('reviewers');
+                                                        // $fail('Reviewers must be selected before moving to review state.');
+                                                        // dd($reviewers);
                                                         // If reviewers list empty, don't allow moving to review state
-                                                        if ($value == Status::Reviewing->value && empty($reviewers)) {
+                                                        if ($value == Status::Reviewing && empty($reviewers)) {
                                                             $fail('Reviewers must be selected before moving to review state.');
                                                         }
 
@@ -138,6 +141,7 @@ class ProposalResource extends Resource
                                                     modifyQueryUsing: fn (Builder $query) => $query->where('is_reviewer', true))
                                                 ->multiple()
                                                 ->label('Reviewers')
+                                                ->live()
                                                 ->createOptionForm([
                                                     Grid::make()
                                                         ->schema([
@@ -155,6 +159,14 @@ class ProposalResource extends Resource
                                                                         ->default(true),
                                                                     Toggle::make('is_default_reviewer')
                                                                         ->label('Is Default Reviewer')
+                                                                        ->rules([
+                                                                            // Only allow is_default_reviewer to be true if is_reviewer is true
+                                                                            fn (\Filament\Forms\Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                                                                if ($value == true && $get('is_reviewer') == false) {
+                                                                                    $fail('Cannot be a default reviewer if not a reviewer.');
+                                                                                }
+                                                                            },
+                                                                        ])
                                                                         ->default(true),
                                                                 ]),
 
@@ -164,6 +176,8 @@ class ProposalResource extends Resource
                                                 ->hintAction(
                                                     \Filament\Forms\Components\Actions\Action::make('addDefaultReviewers')
                                                         ->label('Add Default Reviewers')
+                                                        // Disable if all of the default reviewers are already selected, with $get
+                                                        ->disabled(fn (\Filament\Forms\Get $get): bool => empty(array_diff(\App\Models\User::whereIsDefaultReviewer(true)->pluck('id')->toArray(), $get('reviewers'))))
                                                         ->action(function (\Filament\Forms\Set $set, $state) {
                                                             $defaultReviewers = \App\Models\User::whereIsDefaultReviewer(true)->pluck('id')->toArray();
                                                             // Append default reviewers to existing reviewers

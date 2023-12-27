@@ -66,6 +66,13 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
                 $user->password = '';
             }
         });
+
+        // On saving, disable is_default_reviewer if we are turning off is_reviewer
+        static::saving(function ($user) {
+            if (! $user->is_reviewer) {
+                $user->is_default_reviewer = false;
+            }
+        });
     }
 
     public function canAccessPanel(\Filament\Panel $panel): bool
