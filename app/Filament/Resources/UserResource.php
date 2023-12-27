@@ -7,6 +7,7 @@ use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\TernaryFilter;
@@ -32,14 +33,20 @@ class UserResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Fieldset::make('Roles')
-                    ->columns(4)
+                    ->columns(3)
                     ->schema([
                         Forms\Components\Toggle::make('is_reviewer')
                             ->label('Reviewer')
-                            ->required(),
+                            ->required()
+                            ->hint('Reviewers can be assigned to proposals.'),
+                        Forms\Components\Toggle::make('is_default_reviewer')
+                            ->label('Default Reviewer')
+                            ->required()
+                            ->hint('Default reviewers are automatically assigned to new proposals.'),
                         Forms\Components\Toggle::make('is_admin')
                             ->label('Admin')
-                            ->required(),
+                            ->required()
+                            ->hint('Admins can manage users and proposals.'),
                     ]),
             ]);
     }
@@ -54,14 +61,25 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('is_reviewer')
+                Tables\Columns\ToggleColumn::make('is_reviewer')
                     ->label('Reviewer')
-                    ->sortable()
-                    ->boolean(),
-                Tables\Columns\IconColumn::make('is_admin')
+                    ->sortable(),
+                Tables\Columns\ToggleColumn::make('is_default_reviewer')
+                    ->label('Default Reviewer')
+                    ->sortable(),
+                Tables\Columns\ToggleColumn::make('is_admin')
                     ->label('Admin')
+                    ->rules([
+                        'not_in:1',
+                    ])
                     ->sortable()
-                    ->boolean(),
+                    ->beforeStateUpdated(function ($record, $state) {
+                        Notification::make()
+                            ->success()
+                            ->title("{$record->name} admin status changed")
+                            ->duration(1000)
+                            ->send();
+                    }),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -72,8 +90,9 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                TernaryFilter::make('is_admin')->label('Admin'),
                 TernaryFilter::make('is_reviewer')->label('Reviewer'),
+                TernaryFilter::make('is_default_reviewer')->label('Default Reviewer'),
+                TernaryFilter::make('is_admin')->label('Admin'),
 
             ])
             ->actions([

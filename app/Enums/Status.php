@@ -9,6 +9,8 @@ enum Status: string implements HasColor, HasLabel
 {
     case Pending = 'pending';
     case Reviewing = 'reviewing';
+
+    case Revising = 'revising';
     case Approved = 'approved';
     case Rejected = 'rejected';
 
@@ -17,6 +19,7 @@ enum Status: string implements HasColor, HasLabel
         return match ($this) {
             self::Pending => 'Pending',
             self::Reviewing => 'Reviewing',
+            self::Revising => 'Revising',
             self::Approved => 'Approved',
             self::Rejected => 'Rejected',
         };
@@ -27,6 +30,7 @@ enum Status: string implements HasColor, HasLabel
         return match ($this) {
             self::Pending => 'gray',
             self::Reviewing => 'warning',
+            self::Revising => 'warning',
             self::Approved => 'success',
             self::Rejected => 'danger',
         };
