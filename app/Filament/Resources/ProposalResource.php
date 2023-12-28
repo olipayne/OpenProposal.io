@@ -113,6 +113,7 @@ class ProposalResource extends Resource
                                 ])
                                 ->collapsible(),
                             Section::make('Proposal')
+                                ->extraAttributes(['class' => 'line-numbers'])
                                 ->schema([
                                     TextEntry::make('publication_title')
                                         ->size(TextEntrySize::Large)
