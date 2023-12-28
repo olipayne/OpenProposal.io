@@ -115,10 +115,12 @@ class ProposalResource extends Resource
                             Section::make('Proposal')
                                 ->extraAttributes(['class' => 'line-numbers'])
                                 ->schema([
-                                    TextEntry::make('publication_title')
-                                        ->size(TextEntrySize::Large)
-                                        ->weight(FontWeight::Bold)
-                                        ->label(false),
+                                    Fieldset::make('Publication Title')
+                                        ->schema([
+                                            TextEntry::make('publication_title')
+                                                ->label(false),
+                                        ]),
+
                                     Fieldset::make('Proposed Authors')
                                         ->schema([
                                             TextEntry::make('proposed_authors')
