@@ -60,7 +60,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
     public function topics(): BelongsToMany
     {
-        return $this->belongsToMany(ProposalTopic::class, 'user_topics', 'user_id', 'proposal_topic_id');
+        return $this->belongsToMany(ProposalTopic::class, 'users_topics', 'user_id', 'proposal_topic_id');
     }
 
     protected static function booted()
@@ -72,11 +72,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
             }
         });
 
-        // On saving, disable is_default_reviewer if we are turning off is_reviewer
         static::saving(function ($user) {
             if (! $user->is_reviewer) {
                 $user->is_default_reviewer = false;
+                // Remove the user from any ProposalTopic they were a default reviewer for
+                $user->topics()->detach();
+
             }
+
         });
     }
 

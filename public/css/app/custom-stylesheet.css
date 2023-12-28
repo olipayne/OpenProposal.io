@@ -13,9 +13,8 @@
     margin-left: -2.5em;
     width: 2em;
     color: #888;
-    -webkit-user-select: none;
+    --webkit-user-select: none;
     position: absolute;
-    vertical-align: middle;
     display: block;
     top: 50%;
     -webkit-transform: translateY(-50%);
