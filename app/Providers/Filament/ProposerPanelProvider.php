@@ -29,8 +29,10 @@ class ProposerPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->login()
-            ->registration()
+            ->profile()
+            ->breadcrumbs(false)
             ->passwordReset()
+            ->registration()
             ->discoverResources(in: app_path('Filament/Proposer/Resources'), for: 'App\\Filament\\Proposer\\Resources')
             ->discoverPages(in: app_path('Filament/Proposer/Pages'), for: 'App\\Filament\\Proposer\\Pages')
             ->pages([

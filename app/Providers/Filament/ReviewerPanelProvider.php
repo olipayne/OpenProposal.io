@@ -28,8 +28,13 @@ class ReviewerPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
+            ->brandName(config('app.name').' - Reviewer')
+
             ->login()
             ->passwordReset()
+            ->emailVerification()
+            ->profile()
+            ->breadcrumbs(false)
             ->discoverResources(in: app_path('Filament/Reviewer/Resources'), for: 'App\\Filament\\Reviewer\\Resources')
             ->discoverPages(in: app_path('Filament/Reviewer/Pages'), for: 'App\\Filament\\Reviewer\\Pages')
             ->pages([
