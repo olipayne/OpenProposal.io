@@ -16,33 +16,27 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
-use Illuminate\Validation\Rules\Password;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Jeffgreco13\FilamentBreezy\BreezyCore;
 
-class AdminPanelProvider extends PanelProvider
+class ProposerPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
-            ->id('admin')
-            ->path('admin')
-            ->login()
-            // ->registration()
-            ->passwordReset()
-            ->emailVerification()
-            ->profile()
+            ->id('proposer')
+            ->path('')
             ->colors([
-                'primary' => Color::Green,
+                'primary' => Color::Amber,
             ])
-            ->breadcrumbs(false)
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->login()
+            ->registration()
+            ->passwordReset()
+            ->discoverResources(in: app_path('Filament/Proposer/Resources'), for: 'App\\Filament\\Proposer\\Resources')
+            ->discoverPages(in: app_path('Filament/Proposer/Pages'), for: 'App\\Filament\\Proposer\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(in: app_path('Filament/Proposer/Widgets'), for: 'App\\Filament\\Proposer\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
@@ -60,21 +54,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-            ->authGuard('web')
-            ->plugin(
-                BreezyCore::make()
-                    ->enableTwoFactorAuthentication()
-                    ->passwordUpdateRules(
-                        rules: [Password::default()->mixedCase()],
-                        requiresCurrentPassword: true,
-                    )
-                    ->myProfile(
-                        // shouldRegisterNavigation: true,
-                        shouldRegisterUserMenu: true,
-                    ),
-
-            )
-            ->spa();
+            ]);
     }
 }

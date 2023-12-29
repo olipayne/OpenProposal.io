@@ -85,6 +85,21 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
     public function canAccessPanel(\Filament\Panel $panel): bool
     {
-        return true;
+        // If the user is an admin, they can access all panels
+        if ($this->is_admin) {
+            return true;
+        }
+
+        // If the user is a reviewer, they can access the reviewer panel
+        if ($this->is_reviewer && $panel->getId() === 'reviewer') {
+            return true;
+        }
+
+        // If the user has no special permissions, they can access the general panel
+        if ($panel->getId() === 'proposer') {
+            return true;
+        }
+
+        return false;
     }
 }
