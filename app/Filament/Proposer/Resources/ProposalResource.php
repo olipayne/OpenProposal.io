@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProposalResource extends Resource
 {
@@ -119,5 +120,13 @@ class ProposalResource extends Resource
             'create' => Pages\CreateProposal::route('/create'),
             'edit' => Pages\EditProposal::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Builder|\App\Models\Proposal
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('user_id', auth()->id());
     }
 }

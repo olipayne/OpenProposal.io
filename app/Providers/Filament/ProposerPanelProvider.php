@@ -16,7 +16,9 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Jeffgreco13\FilamentBreezy\BreezyCore;
 
 class ProposerPanelProvider extends PanelProvider
 {
@@ -33,6 +35,7 @@ class ProposerPanelProvider extends PanelProvider
             ->breadcrumbs(false)
             ->passwordReset()
             ->registration()
+            ->emailVerification()
             ->discoverResources(in: app_path('Filament/Proposer/Resources'), for: 'App\\Filament\\Proposer\\Resources')
             ->discoverPages(in: app_path('Filament/Proposer/Pages'), for: 'App\\Filament\\Proposer\\Pages')
             ->pages([
@@ -56,6 +59,19 @@ class ProposerPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->authGuard('web')
+            ->plugin(
+                BreezyCore::make()
+                    ->enableTwoFactorAuthentication()
+                    ->passwordUpdateRules(
+                        rules: [Password::default()->mixedCase()],
+                        requiresCurrentPassword: true,
+                    )
+                    ->myProfile(
+                        shouldRegisterUserMenu: true,
+                    ),
+
+            );
     }
 }

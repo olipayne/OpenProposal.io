@@ -16,7 +16,9 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Jeffgreco13\FilamentBreezy\BreezyCore;
 
 class ReviewerPanelProvider extends PanelProvider
 {
@@ -29,7 +31,6 @@ class ReviewerPanelProvider extends PanelProvider
                 'primary' => Color::Amber,
             ])
             ->brandName(config('app.name').' - Reviewer')
-
             ->login()
             ->passwordReset()
             ->emailVerification()
@@ -58,6 +59,19 @@ class ReviewerPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->authGuard('web')
+            ->plugin(
+                BreezyCore::make()
+                    ->enableTwoFactorAuthentication()
+                    ->passwordUpdateRules(
+                        rules: [Password::default()->mixedCase()],
+                        requiresCurrentPassword: true,
+                    )
+                    ->myProfile(
+                        shouldRegisterUserMenu: true,
+                    ),
+
+            );
     }
 }

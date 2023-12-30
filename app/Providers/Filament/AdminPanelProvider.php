@@ -70,11 +70,9 @@ class AdminPanelProvider extends PanelProvider
                         requiresCurrentPassword: true,
                     )
                     ->myProfile(
-                        // shouldRegisterNavigation: true,
                         shouldRegisterUserMenu: true,
                     ),
 
-            )
-            ->spa();
+            );
     }
 }
