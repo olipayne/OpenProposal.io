@@ -21,26 +21,41 @@ class Proposal extends Model
         'proposed_authors' => 'array',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<User, Proposal>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<Vote>
+     */
     public function votes(): HasMany
     {
         return $this->hasMany(Vote::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<ProposalComment>
+     */
     public function proposalComments(): HasMany
     {
         return $this->hasMany(ProposalComment::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<User>
+     */
     public function reviewers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'reviewers', 'proposal_id', 'user_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<ProposalTopic>
+     */
     public function topic(): HasOne
     {
         return $this->hasOne(ProposalTopic::class);

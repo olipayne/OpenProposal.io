@@ -48,16 +48,25 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         'password' => 'hashed',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<Proposal>
+     */
     public function proposalsToReview(): BelongsToMany
     {
         return $this->belongsToMany(Proposal::class, 'reviewers', 'user_id', 'proposal_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<Proposal>
+     */
     public function proposals(): HasMany
     {
         return $this->hasMany(Proposal::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany<ProposalTopic>
+     */
     public function topics(): BelongsToMany
     {
         return $this->belongsToMany(ProposalTopic::class, 'users_topics', 'user_id', 'proposal_topic_id');

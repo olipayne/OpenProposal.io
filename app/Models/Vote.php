@@ -17,11 +17,17 @@ class Vote extends Model
         'vote' => 'integer',
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<Proposal, Vote>
+     */
     public function proposal(): BelongsTo
     {
         return $this->belongsTo(Proposal::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<User, Vote>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

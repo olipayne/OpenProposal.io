@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Enums\Status;
 use App\Filament\Resources\ProposalResource\Pages;
 use App\Models\Proposal;
+use Filament\Forms\Components\Grid as ComponentsGrid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -73,8 +74,11 @@ class ProposalResource extends Resource
                     ->searchable()
                     ->multiple()
                     ->label('Proposer')
-                    ->options(fn (): array => \App\Models\User::all()->pluck('name', 'id')->toArray()),
-            ])
+                    ->options(function (): array {
+                        $users = \App\Models\User::all();
+
+                        return $users->isEmpty() ? [] : $users->pluck('name', 'id')->toArray();
+                    }),            ])
             ->filtersTriggerAction(
                 fn (Action $action) => $action->button()->label('Filter'))
             ->actions([
@@ -96,10 +100,10 @@ class ProposalResource extends Resource
                                         ->columns(3)
                                         ->schema([
                                             TextEntry::make('user.name')
-                                                ->label(false),
+                                                ->label(''),
                                             TextEntry::make('user.email')
                                                 ->columns(2)
-                                                ->label(false),
+                                                ->label(''),
                                         ]),
                                     Fieldset::make('Applicant Info')
                                         ->schema([
@@ -107,7 +111,7 @@ class ProposalResource extends Resource
                                                 ->columnSpanFull()
                                                 ->markdown()
                                                 ->prose()
-                                                ->label(false),
+                                                ->label(''),
                                         ]),
 
                                 ])
@@ -118,14 +122,14 @@ class ProposalResource extends Resource
                                     Fieldset::make('Publication Title')
                                         ->schema([
                                             TextEntry::make('publication_title')
-                                                ->label(false),
+                                                ->label(''),
                                         ]),
 
                                     Fieldset::make('Proposed Authors')
                                         ->schema([
                                             TextEntry::make('proposed_authors')
                                                 ->columnSpanFull()
-                                                ->label(false),
+                                                ->label(''),
                                         ]
                                         ),
                                     Fieldset::make('Study Background')
@@ -134,7 +138,7 @@ class ProposalResource extends Resource
                                                 ->columnSpanFull()
                                                 ->markdown()
                                                 ->prose()
-                                                ->label(false),
+                                                ->label(''),
                                         ]),
                                     Fieldset::make('Research Question')
                                         ->schema([
@@ -142,7 +146,7 @@ class ProposalResource extends Resource
                                                 ->columnSpanFull()
                                                 ->markdown()
                                                 ->prose()
-                                                ->label(false),
+                                                ->label(''),
                                         ]),
                                     Fieldset::make('Data and Population')
                                         ->schema([
@@ -150,7 +154,7 @@ class ProposalResource extends Resource
                                                 ->columnSpanFull()
                                                 ->markdown()
                                                 ->prose()
-                                                ->label(false),
+                                                ->label(''),
                                         ]),
                                     Fieldset::make('Analysis Plan')
                                         ->schema([
@@ -158,7 +162,7 @@ class ProposalResource extends Resource
                                                 ->columnSpanFull()
                                                 ->markdown()
                                                 ->prose()
-                                                ->label(false),
+                                                ->label(''),
                                         ]),
                                     Fieldset::make('Timeline')
                                         ->schema([
@@ -181,7 +185,7 @@ class ProposalResource extends Resource
                         ]),
 
                     Section::make('Metadata')
-                        ->label(false)
+                        ->label('')
                         ->collapsible()
                         ->headerActions([
                             // \Filament\Infolists\Components\Actions::make([
@@ -213,7 +217,11 @@ class ProposalResource extends Resource
                                     Select::make('proposal_topic_id')
                                         ->required()
                                         ->live()
-                                        ->options(fn (): array => \App\Models\ProposalTopic::all()->pluck('name', 'id')->toArray())
+                                        ->options(function (): array {
+                                            $topics = \App\Models\ProposalTopic::all();
+
+                                            return $topics->isEmpty() ? [] : $topics->pluck('name', 'id')->toArray();
+                                        })
                                         ->label('Topic'),
                                     Select::make('reviewers')
                                         ->preload()
@@ -229,13 +237,13 @@ class ProposalResource extends Resource
                                         ->label('Reviewers')
                                         ->live()
                                         ->createOptionForm([
-                                            Grid::make()
+                                            ComponentsGrid::make()
                                                 ->schema([
                                                     TextInput::make('name')
-                                                        ->disableAutocomplete()
+                                                        ->autocomplete(false)
                                                         ->required(),
                                                     TextInput::make('email')
-                                                        ->disableAutocomplete()
+                                                        ->autocomplete(false)
                                                         ->required()
                                                         ->email(),
                                                     \Filament\Forms\Components\Fieldset::make('Roles')
@@ -257,7 +265,6 @@ class ProposalResource extends Resource
                                                         ]),
 
                                                 ]),
-
                                         ])
                                         ->hintAction(
                                             \Filament\Forms\Components\Actions\Action::make('addDefaultReviewers')
@@ -265,9 +272,12 @@ class ProposalResource extends Resource
                                                 // Disable if all of the default reviewers and reviewers for this topic are already selected
                                                 ->disabled(function (\Filament\Forms\Get $get) {
                                                     $defaultReviewers = \App\Models\User::whereIsDefaultReviewer(true)->pluck('id')->toArray();
-                                                    $topicReviewers = $get('proposal_topic_id') ? \App\Models\ProposalTopic::find($get('proposal_topic_id'))->members->pluck('id')->toArray() : [];
+                                                    $topicReviewers = $get('proposal_topic_id') ? \App\Models\ProposalTopic::find($get('proposal_topic_id'))?->members?->pluck('id')->toArray() : [];
                                                     // If all default reviewers and topic reviewers are already selected, disable the button
-                                                    if (empty(array_diff($defaultReviewers, $get('reviewers'))) && empty(array_diff($topicReviewers, $get('reviewers')))) {
+                                                    $defaultReviewers = (array) $defaultReviewers;
+                                                    $topicReviewers = (array) $topicReviewers;
+
+                                                    if (empty(array_diff($defaultReviewers, (array) $get('reviewers'))) && empty(array_diff($topicReviewers, (array) $get('reviewers')))) {
                                                         return true;
                                                     }
 
@@ -276,9 +286,9 @@ class ProposalResource extends Resource
                                                 })
                                                 ->action(function (\Filament\Forms\Set $set, \Filament\Forms\Get $get, $state) {
                                                     $defaultReviewers = \App\Models\User::whereIsDefaultReviewer(true)->pluck('id')->toArray();
-                                                    $topicReviewers = $get('proposal_topic_id') ? \App\Models\ProposalTopic::find($get('proposal_topic_id'))->members->pluck('id')->toArray() : [];
+                                                    $topicReviewers = $get('proposal_topic_id') ? \App\Models\ProposalTopic::find($get('proposal_topic_id'))?->members?->pluck('id')->toArray() : [];
                                                     // Append all reviewers to existing reviewers
-                                                    $set('reviewers', array_unique(array_merge($get('reviewers'), $defaultReviewers, $topicReviewers)));
+                                                    $set('reviewers', array_unique(array_merge((array) $get('reviewers'), (array) $defaultReviewers, (array) ($topicReviewers ?? []))));
 
                                                 })
                                         ),
@@ -288,29 +298,27 @@ class ProposalResource extends Resource
                                     $record->touch();
                                 })
                                 ->closeModalByClickingAway(false),
-
-                            // ]),
                         ])
                         ->schema([
                             FieldSet::make('Status')
                                 ->schema([
                                     TextEntry::make('status')
-                                        ->label(false)
+                                        ->label('')
                                         ->columnSpanFull()
                                         ->size(TextEntrySize::Large)
                                         ->alignCenter()
                                         ->weight(FontWeight::Bold)
-                                        ->color(fn (Proposal $record): string => $record->status->getColor()),
+                                        // Use the getColor() method on the Status enum to get the color for the status
+                                        ->color(fn (Proposal $record): string => $record->status->getColor() ?? 'gray'),
                                 ]),
-
                             Fieldset::make('Reviewers')
                                 ->columns(1)
                                 ->schema([
                                     RepeatableEntry::make('reviewers')
-                                        ->label(false)
+                                        ->label('')
                                         ->schema([
                                             TextEntry::make('name')
-                                                ->label(false),
+                                                ->label(''),
 
                                         ])
                                         ->grid(2),
