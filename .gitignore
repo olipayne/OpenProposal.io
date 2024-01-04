@@ -18,3 +18,5 @@ yarn-error.log
 /.idea
 /.vscode
 /public/css/app/custom-stylesheet.css
+/public/css/filament
+/public/js/filament
