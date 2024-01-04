@@ -311,8 +311,7 @@ class ProposalResource extends Resource
                                         ->size(TextEntrySize::Large)
                                         ->alignCenter()
                                         ->weight(FontWeight::Bold)
-                                        // Use the getColor() method on the Status enum to get the color for the status
-                                        ->color(fn (Proposal $record): string => $record->status->getColor() ?? 'gray'),
+                                        ->color(fn (Proposal $record): string => is_string($record->status->getColor()) ? $record->status->getColor() : 'gray'),
                                 ]),
                             Fieldset::make('Reviewers')
                                 ->columns(1)
