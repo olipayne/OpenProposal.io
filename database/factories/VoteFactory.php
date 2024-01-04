@@ -2,11 +2,10 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
-use App\Models\;
 use App\Models\Proposal;
+use App\Models\User;
 use App\Models\Vote;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 class VoteFactory extends Factory
 {
@@ -24,7 +23,7 @@ class VoteFactory extends Factory
     {
         return [
             'proposal_id' => Proposal::factory(),
-            'user_id' => ::factory(),
+            'user_id' => User::factory(),
             'vote' => $this->faker->numberBetween(-8, 8),
             'comment' => $this->faker->regexify('[A-Za-z0-9]{1000}'),
         ];

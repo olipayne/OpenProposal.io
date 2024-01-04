@@ -80,7 +80,8 @@ class ProposalResource extends Resource
                         return $users->isEmpty() ? [] : $users->pluck('name', 'id')->toArray();
                     }),            ])
             ->filtersTriggerAction(
-                fn (Action $action) => $action->button()->label('Filter'))
+                fn (Action $action) => $action->button()->label('Filter')
+            )
             ->actions([
             ])
             ->bulkActions([
@@ -126,11 +127,12 @@ class ProposalResource extends Resource
                                         ]),
 
                                     Fieldset::make('Proposed Authors')
-                                        ->schema([
-                                            TextEntry::make('proposed_authors')
-                                                ->columnSpanFull()
-                                                ->label(''),
-                                        ]
+                                        ->schema(
+                                            [
+                                                TextEntry::make('proposed_authors')
+                                                    ->columnSpanFull()
+                                                    ->label(''),
+                                            ]
                                         ),
                                     Fieldset::make('Study Background')
                                         ->schema([
@@ -232,7 +234,8 @@ class ProposalResource extends Resource
                                         ->relationship(
                                             name: 'reviewers',
                                             titleAttribute: 'name',
-                                            modifyQueryUsing: fn ($query) => $query->where('is_reviewer', true))
+                                            modifyQueryUsing: fn ($query) => $query->where('is_reviewer', true)
+                                        )
                                         ->multiple()
                                         ->label('Reviewers')
                                         ->live()

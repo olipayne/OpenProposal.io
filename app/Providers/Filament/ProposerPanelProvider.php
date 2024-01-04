@@ -71,7 +71,6 @@ class ProposerPanelProvider extends PanelProvider
                     ->myProfile(
                         shouldRegisterUserMenu: true,
                     ),
-
             );
     }
 }

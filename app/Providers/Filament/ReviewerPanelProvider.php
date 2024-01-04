@@ -30,7 +30,7 @@ class ReviewerPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->brandName(config('app.name').' - Reviewer')
+            ->brandName(config('app.name') . ' - Reviewer')
             ->login()
             ->passwordReset()
             ->emailVerification()
@@ -71,7 +71,6 @@ class ReviewerPanelProvider extends PanelProvider
                     ->myProfile(
                         shouldRegisterUserMenu: true,
                     ),
-
             );
     }
 }

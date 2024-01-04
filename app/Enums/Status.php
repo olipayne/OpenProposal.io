@@ -25,7 +25,7 @@ enum Status: string implements HasColor, HasLabel
         };
     }
 
-    public function getColor(): string|array|null
+    public function getColor(): string | array | null
     {
         return match ($this) {
             self::Pending => 'gray',

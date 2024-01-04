@@ -28,7 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
-            ->brandName(config('app.name').' - Admin')
+            ->brandName(config('app.name') . ' - Admin')
             ->login()
             ->passwordReset()
             ->emailVerification()
@@ -72,7 +72,6 @@ class AdminPanelProvider extends PanelProvider
                     ->myProfile(
                         shouldRegisterUserMenu: true,
                     ),
-
             );
     }
 }
